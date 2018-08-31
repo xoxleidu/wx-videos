@@ -1,0 +1,35 @@
+<view>
+    <!-- <view class="login-icon">
+        <image class="login-img" src="{{fileServerUrl}}/images/test.jpg"></image>
+    </view> -->
+    <form bindsubmit='upload'>
+      <view class="inputView">
+        <label class="loginLabel">视频描述：</label>
+        <input name="desc" class="inputText" placeholder="说点什么吧" />
+      </view>
+
+      <!-- 提交 -->
+      <button class="submitBtn" type="primary" form-type='submit'>上传视频</button>
+      
+      <button class="gobackBtn" type="warn" form-type='reset'>重置</button>
+
+      <view class="bgmBanerView">
+        
+      </view>
+
+      <radio-group name="bgmId">
+
+
+          <block wx:for="{{bgmList}}">
+            <view class='container bgmbg'>
+              <audio name="{{item.name}}" author="{{item.author}}" src="{{fileServerUrl}}{{item.path}}" style='width:300px' id="myAudio" controls loop></audio>
+              <radio style='margin-top:20px;' value='{{item.id}}'></radio>
+            </view>
+          </block>
+
+
+        </radio-group>
+
+        
+    </form>
+</view>
