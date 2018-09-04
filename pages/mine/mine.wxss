@@ -70,9 +70,18 @@ page {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    padding-top: 10rpx;
+    width: 100%;
+}
+
+.container-video-row {
+  width: 100%;
+  text-align: center;
 }
 
 .videoImage {
-    width: 250rpx;
+    padding: 5rpx;
+    /* width: 242rpx; */
+    width: 740rpx;
     height: 180px;
 }

@@ -3,6 +3,24 @@ const app = getApp()
 Page({
   data: {
     faceUrl: "../resource/images/noneface.png",
+
+    myVideoList: [],
+    myVideoPage: 1,
+    myVideoTotal: 1,
+
+    myWorkFalg: false,
+    //myLikesFalg: true,
+    //myFollowFalg: true
+  },
+
+  onLoad: function (params){
+    var me = this;
+    //console.info(app.fileServerUrl + "/File/user/" + app.userInfo.id + "/videos/");
+    
+    wx.showLoading({
+      title: '请等待...',
+    });
+    me.getMyVideoList(1);
   },
 
   logout: function () {
@@ -78,6 +96,93 @@ Page({
           }
         }
       })
+  },
+
+  getMyVideoList: function (page) {
+    var me = this;
+    var fileServerUrl = app.fileServerUrl + "/File/user/" + app.userInfo.id + "/videos/";
+    // 查询视频信息
+    wx.showLoading();
+    // 调用后端
+    var serverUrl = app.serverUrl;
+    wx.request({
+      url: serverUrl + '/video/showAll/?page=' + page + '&pageSize=4',
+      method: "POST",
+      data: {
+        //userId: me.data.userId
+        userId: app.userInfo.id
+      },
+      header: {
+        'content-type': 'application/json' // 默认值
+      },
+      success: function (res) {
+        console.log(res);
+        var myVideoList = res.data.data.rows;
+        wx.hideLoading();
+
+        var newVideoList = me.data.myVideoList;
+        console.info(page);
+        console.info(res.data.data.total);
+        
+        me.setData({
+          myVideoPage: page,
+          //myVideoList: newVideoList.concat(myVideoList),
+          myVideoList: myVideoList,
+          myVideoTotal: res.data.data.total,
+          serverUrl: app.serverUrl,
+          fileServerUrl: fileServerUrl
+        });
+      }
+    })
+  },
+
+  // 到底部后触发加载
+  onReachBottom: function () {
+    var myWorkFalg = this.data.myWorkFalg;
+    // var myLikesFalg = this.data.myLikesFalg;
+    // var myFollowFalg = this.data.myFollowFalg;
+
+    if (!myWorkFalg) {
+      var currentPage = this.data.myVideoPage;
+      var totalPage = this.data.myVideoTotal;
+      // 获取总页数进行判断，如果当前页数和总页数相等，则不分页
+      if (currentPage === totalPage) {
+        wx.showToast({
+          title: '已经没有视频啦...',
+          icon: "none"
+        });
+        return;
+      }
+      var page = currentPage + 1;
+      this.getMyVideoList(page);
+    } 
+    // else if (!myLikesFalg) {
+    //   var currentPage = this.data.likeVideoPage;
+    //   var totalPage = this.data.myLikesTotal;
+    //   // 获取总页数进行判断，如果当前页数和总页数相等，则不分页
+    //   if (currentPage === totalPage) {
+    //     wx.showToast({
+    //       title: '已经没有视频啦...',
+    //       icon: "none"
+    //     });
+    //     return;
+    //   }
+    //   var page = currentPage + 1;
+    //   this.getMyLikesList(page);
+    // } else if (!myFollowFalg) {
+    //   var currentPage = this.data.followVideoPage;
+    //   var totalPage = this.data.followVideoTotal;
+    //   // 获取总页数进行判断，如果当前页数和总页数相等，则不分页
+    //   if (currentPage === totalPage) {
+    //     wx.showToast({
+    //       title: '已经没有视频啦...',
+    //       icon: "none"
+    //     });
+    //     return;
+    //   }
+    //   var page = currentPage + 1;
+    //   this.getMyFollowList(page);
+    // }
   }
 
 })
