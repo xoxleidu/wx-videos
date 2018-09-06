@@ -1,9 +1,40 @@
 <view>
   <view class='container'>
-    <image src="{{faceUrl}}" class="face" bindtap='changeFace'></image>
-    <label class='nickname'>{{nickname}}</label>
-    <button size='mini' class='primary' bindtap='uploadVideo'> 上传作品</button>
-    <button size='mini' type='' class='logout' bindtap='logout'>注销</button>
+    <view class='container-left'>
+      <image src="{{faceUrl}}" class="face" bindtap='changeFace'></image>
+      <view class='nickname'>{{nickname}}</view>
+      <view class='nicktext'>个性签名</view>
+    </view>
+    <view class='container-right'>
+      <view class='vlogout'>
+        <button size='mini' type='' class='logout' bindtap='logout'>注销</button>
+      </view>
+      <view class='vprimary'>
+        <button size='default' class='primary' bindtap='uploadVideo'>上传作品</button>
+      </view>
+      <view class='floatright'>
+        <view class='vfuhao'>
+          <button class='fuhao'>#36岁</button>
+        </view>
+        <view class='vfuhao'>
+          <button class='fuhao'>北京</button>
+        </view>
+        <view class='vfuhao'>
+          <button class='fuhao'>处女座</button>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="linex"><view class="linec"></view></view>
+  <view class='container-xx'>
+    <label class='info-items'>{{fansCounts}} 粉丝</label>
+    <label class='info-items'>{{followCounts}} 关注</label>
+    <label class='info-items'>{{receiveLikeCounts}} 获赞</label>
+  </view>
+  <view class='container-row'>
+    <label class='info-items'>作品</label>
+    <label class='info-items'>动态</label>
+    <label class='info-items'>喜欢</label>
   </view>
 </view>
 <view class="line"></view>
@@ -14,6 +45,5 @@
         <image src='{{fileServerUrl}}{{item.coverPath}}' class='videoImage' mode="aspectFill" bindtap='showVideo' data-arrindex='{{index}}'></image>
     </block>
 </view>
-
 
 </view>

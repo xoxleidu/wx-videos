@@ -1,9 +1,10 @@
+var videoUtils = require('../../utils/videoUtils.js')
+
 const app = getApp()
 
 Page({
   data: {
     faceUrl: "../resource/images/noneface.png",
-
     myVideoList: [],
     myVideoPage: 1,
     myVideoTotal: 1,
@@ -15,19 +16,101 @@ Page({
 
   onLoad: function (params){
     var me = this;
-    //console.info(app.fileServerUrl + "/File/user/" + app.userInfo.id + "/videos/");
-    
+    var user = app.getGlobalUserInfo();
+    var serverUrl = app.serverUrl;
+       
     wx.showLoading({
       title: '请等待...',
     });
+
+    //用户信息
+    wx.request({
+      url: serverUrl + '/user/query?userId=' + user.id,// + "&fanId=" + user.id,
+      method: "POST",
+      // header: {
+      //   'content-type': 'application/json', // 默认值
+      //   'headerUserId': user.id,
+      //   'headerUserToken': user.userToken
+      // },
+      success: function (res) {
+        console.log(res.data);
+        wx.hideLoading();
+        if (res.data.status == 200) {
+          var userInfo = res.data.data;
+          var faceUrl = "../resource/images/noneface.png";
+          if (userInfo.faceImage != null && userInfo.faceImage != '' && userInfo.faceImage != undefined) {
+            faceUrl = app.fileServerUrl + "/File/user/" + user.id + "/face/" + userInfo.faceImage;
+          }
+
+
+          me.setData({
+            faceUrl: faceUrl,
+            //fansCounts: userInfo.fansCounts,
+            //followCounts: userInfo.followCounts,
+            //receiveLikeCounts: userInfo.receiveLikeCounts,
+            nickname: userInfo.nickname,
+            //isFollow: userInfo.follow
+          });
+        } else if (res.data.status == 502) {
+          wx.showToast({
+            title: res.data.msg,
+            duration: 3000,
+            icon: "none",
+            success: function () {
+              wx.redirectTo({
+                url: '../userLogin/login',
+              })
+            }
+          })
+        }
+      }
+    })
+
     me.getMyVideoList(1);
   },
 
-  logout: function () {
-    var user = app.userInfo;
-    //var user = app.getGlobalUserInfo();
+  //上传头像
+  changeFace: function () {
+    var me = this;
+    wx.chooseImage({
+      count: 1, // 默认9
+      sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+      sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+      success: function (res) {
+        // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
+        var tempFilePaths = res.tempFilePaths
+        wx.showLoading({
+          title: '请等待...',
+        });
+        var user = app.getGlobalUserInfo();
+        var serverUrl = app.serverUrl;
+        //调用后端
+        wx.uploadFile({
+          url: serverUrl + '/user/uploadface', 
+          filePath: tempFilePaths[0],
+          name: 'file',
+          formData: {
+            'userId': user.id
+          },
+          success: function (res) {
+            wx.hideLoading();
+            var faceUrlDB = JSON.parse(res.data);
+            var faceUrl = app.fileServerUrl + "/File/user/" + user.id + "/face/" + faceUrlDB.data;
+            me.setData({
+              faceUrl: faceUrl
+            })
+            //do something
+          }
+        })
 
+      }
+    })
+  },
+
+  logout: function () {
+    var user = app.getGlobalUserInfo();
     var serverUrl = app.serverUrl;
+
     wx.showLoading({
       title: '请等待...',
     });
@@ -35,11 +118,7 @@ Page({
     wx.request({
       url: serverUrl + '/logout?userId=' + user.id,
       method: "POST",
-      header: {
-        'content-type': 'application/json' // 默认值
-      },
       success: function (res) {
-        console.log(res.data);
         wx.hideLoading();
         if (res.data.status == 200) {
           // 登录成功跳转 
@@ -48,9 +127,9 @@ Page({
             icon: 'success',
             duration: 2000
           });
-          app.userInfo = null;
+          //app.userInfo = null;
           // 注销以后，清空缓存
-          //wx.removeStorageSync("userInfo")
+          wx.removeStorageSync("userInfo")
           // 页面跳转
           wx.redirectTo({
             url: '../userLogin/login',
@@ -61,79 +140,60 @@ Page({
   },
 
   uploadVideo: function () {
-      var me = this
-      wx.chooseVideo({
-        sourceType: ['album'],
-        maxDuration: 60,
-        success: function (res) {
-          var duration = res.duration;
-          var tmpHeight = res.height;
-          var tmpWidth = res.width;
-          var tmpVideoUrl = res.tempFilePath;
-          var tmpCoverUrl = res.thumbTempFilePath;
-          if (duration > 61) {
-            wx.showToast({
-              title: '视频长度不能超过10秒...',
-              icon: "none",
-              duration: 2500
-            })
-          } else if (duration < 1) {
-            wx.showToast({
-              title: '视频长度太短，请上传超过1秒的视频...',
-              icon: "none",
-              duration: 2500
-            })
-          } else {
-            // 打开选择bgm的页面
-            wx.navigateTo({
-              url: '../chooseBgm/chooseBgm?duration=' + duration
-                + "&tmpHeight=" + tmpHeight
-                + "&tmpWidth=" + tmpWidth
-                + "&tmpVideoUrl=" + tmpVideoUrl
-                + "&tmpCoverUrl=" + tmpCoverUrl
-              ,
-            })
-          }
-        }
-      })
+    videoUtils.uploadVideo();
   },
 
   getMyVideoList: function (page) {
+   
     var me = this;
-    var fileServerUrl = app.fileServerUrl + "/File/user/" + app.userInfo.id + "/videos/";
+    var userInfo = app.getGlobalUserInfo();
+    var serverUrl = app.serverUrl;
+    var fileServerUrl = app.fileServerUrl + "/File/user/" + userInfo.id + "/videos/";
+    
     // 查询视频信息
     wx.showLoading();
     // 调用后端
-    var serverUrl = app.serverUrl;
     wx.request({
-      url: serverUrl + '/video/showAll/?page=' + page + '&pageSize=4',
+      url: serverUrl + '/video/showAll/?page=' + page + '&pageSize=9',
       method: "POST",
       data: {
-        //userId: me.data.userId
-        userId: app.userInfo.id
-      },
-      header: {
-        'content-type': 'application/json' // 默认值
+        userId: userInfo.id
       },
       success: function (res) {
-        console.log(res);
-        var myVideoList = res.data.data.rows;
         wx.hideLoading();
+        wx.hideNavigationBarLoading();
+        if (res.data.data.total === 0) {
+          wx.showToast({
+            title: '没有视频,请上传',
+            duration: 2000,
+            icon: "none"
+          })
+        }
+        if(page === 1) {
+          me.setData({
+            myVideoList: []
+          })
+        }
 
+        var myVideoList = res.data.data.rows;
         var newVideoList = me.data.myVideoList;
-        console.info(page);
-        console.info(res.data.data.total);
         
         me.setData({
           myVideoPage: page,
-          //myVideoList: newVideoList.concat(myVideoList),
-          myVideoList: myVideoList,
+          myVideoList: newVideoList.concat(myVideoList),
           myVideoTotal: res.data.data.total,
-          serverUrl: app.serverUrl,
           fileServerUrl: fileServerUrl
         });
       }
     })
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function(){
+    wx.showNavigationBarLoading();
+    this.getMyVideoList(1);
   },
 
   // 到底部后触发加载
@@ -183,6 +243,16 @@ Page({
     //   var page = currentPage + 1;
     //   this.getMyFollowList(page);
     // }
+  },
+
+  showVideo:function(e){
+    var me = this;
+    var arrindex = e.target.dataset.arrindex;
+    var videoList = this.data.myVideoList;
+    var videoInfo = JSON.stringify(videoList[arrindex]); 
+    wx.navigateTo({
+      url: '../videoInfo/videoInfo?videoInfo=' + videoInfo
+    })
   }
 
 })

@@ -3,6 +3,8 @@ const app = getApp()
 Page({
     data: {
        fileServerUrl: app.fileServerUrl + "/File",
+       bgmList: [],
+       videoParams: {}
     },
 
     onLoad: function (params) {
@@ -57,9 +59,6 @@ Page({
       var bgmId = e.detail.value.bgmId;
       var desc = e.detail.value.desc;
 
-      console.log("bgmId:" + bgmId);
-      console.log("desc:" + desc);
-
       var duration = me.data.videoParams.duration;
       var tmpHeight = me.data.videoParams.tmpHeight;
       var tmpWidth = me.data.videoParams.tmpWidth;
@@ -72,13 +71,11 @@ Page({
       })
       var serverUrl = app.serverUrl;
       // fixme 修改原有的全局对象为本地缓存
-      //var userInfo = app.getGlobalUserInfo();
-      
-      console.info(app.userInfo.id + "||" + bgmId + "||" + desc + "||" + duration + "||" + tmpHeight + "||" + tmpWidth + "||" + tmpVideoUrl);
+      var userInfo = app.getGlobalUserInfo();
       wx.uploadFile({
         url: serverUrl + '/video/upload',
         formData: {
-          userId: app.userInfo.id,    // fixme 原来的 app.userInfo.id
+          userId: userInfo.id,    // fixme 原来的 app.userInfo.id
           bgmId: bgmId,
           desc: desc,
           videoSeconds: duration,
@@ -136,7 +133,7 @@ Page({
             //     } else {
             //       wx.showToast({
             //         title: '上传失败!~~',
-            //         icon: "success"
+            //         icon: "none"
             //       });
             //     }
 
@@ -146,7 +143,7 @@ Page({
 
           } else if (res.data.status == 502) {
             wx.showToast({
-              title: res.data.msg,
+              title: data.msg,
               duration: 2000,
               icon: "none"
             });
@@ -155,8 +152,9 @@ Page({
             })
           } else {
             wx.showToast({
-              title: '上传失败!~~',
-              icon: "success"
+              title: data.msg,
+              duration: 2000,
+              icon: "none"
             });
           }
 

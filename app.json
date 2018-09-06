@@ -2,9 +2,12 @@
   "pages":[
     "pages/userLogin/login",
     "pages/mine/mine",
+    "pages/search/search",
+    "pages/videoList/videoList",
+    "pages/videoInfo/videoInfo",
+    "pages/index/index",
     "pages/chooseBgm/chooseBgm",
-    "pages/userRegist/regist",
-    "pages/index/index"
+    "pages/userRegist/regist"
   ],
   "window":{
     "backgroundTextStyle":"light",
