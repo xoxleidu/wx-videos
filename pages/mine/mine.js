@@ -18,39 +18,52 @@ Page({
     var me = this;
     var user = app.getGlobalUserInfo();
     var serverUrl = app.serverUrl;
-       
+    var userId = user.id;
+    var resultUserId = params.resultUserId;
+    if (resultUserId != null && resultUserId != "" && resultUserId != undefined) {
+      userId = resultUserId;
+    }
     wx.showLoading({
       title: '请等待...',
     });
-
     //用户信息
     wx.request({
-      url: serverUrl + '/user/query?userId=' + user.id,// + "&fanId=" + user.id,
+      url: serverUrl + '/user/query?userId=' + userId,// + "&fanId=" + user.id,
       method: "POST",
-      // header: {
-      //   'content-type': 'application/json', // 默认值
-      //   'headerUserId': user.id,
-      //   'headerUserToken': user.userToken
-      // },
+      header: {
+        'content-type': 'application/json', // 默认值
+        'headerUserId': user.id,
+        'headerUserToken': user.userToken
+      },
       success: function (res) {
-        console.log(res.data);
         wx.hideLoading();
         if (res.data.status == 200) {
-          var userInfo = res.data.data;
+          var userRes = res.data.data;
           var faceUrl = "../resource/images/noneface.png";
-          if (userInfo.faceImage != null && userInfo.faceImage != '' && userInfo.faceImage != undefined) {
-            faceUrl = app.fileServerUrl + "/File/user/" + user.id + "/face/" + userInfo.faceImage;
+          if (userRes.faceImage != null && userRes.faceImage != '' && userRes.faceImage != undefined) {
+            faceUrl = app.fileServerUrl + "/File/user/" + userRes.id + "/face/" + userRes.faceImage;
           }
 
 
           me.setData({
             faceUrl: faceUrl,
-            //fansCounts: userInfo.fansCounts,
-            //followCounts: userInfo.followCounts,
-            //receiveLikeCounts: userInfo.receiveLikeCounts,
-            nickname: userInfo.nickname,
-            //isFollow: userInfo.follow
+            fansCounts: userRes.fansCounts,
+            followCounts: userRes.followCounts,
+            receiveLikeCounts: userRes.receiveLikeCounts,
+            nickname: userRes.nickname,
+            //isFollow: userRes.follow
           });
+        } else if (res.data.status == 500) {
+          wx.showToast({
+            title: res.data.msg,
+            duration: 3000,
+            icon: "none",
+            success: function () {
+              wx.redirectTo({
+                url: '../userLogin/login',
+              })
+            }
+          })
         } else if (res.data.status == 502) {
           wx.showToast({
             title: res.data.msg,
@@ -92,17 +105,45 @@ Page({
           formData: {
             'userId': user.id
           },
+          header: {
+            'content-type': 'application/json', // 默认值
+            'headerUserId': user.id,
+            'headerUserToken': user.userToken
+          },
           success: function (res) {
             wx.hideLoading();
-            var faceUrlDB = JSON.parse(res.data);
-            var faceUrl = app.fileServerUrl + "/File/user/" + user.id + "/face/" + faceUrlDB.data;
-            me.setData({
-              faceUrl: faceUrl
-            })
-            //do something
+            var data = JSON.parse(res.data);
+            console.info(data);
+            if (data.status == 200) {
+              wx.showToast({
+                title: '上传成功!~~',
+                icon: "success"
+              });
+
+              var imageUrl = data.data;
+              me.setData({
+                faceUrl: app.fileServerUrl + "/File/user/" + user.id + "/face/" + imageUrl
+              });
+
+            } else if (data.status == 500) {
+              wx.showToast({
+                title: data.msg
+              });
+            } else if (data.status == 502) {
+              wx.showToast({
+                title: data.msg,
+                duration: 2000,
+                icon: "none",
+                success: function () {
+                  wx.redirectTo({
+                    url: '../userLogin/login',
+                  })
+                }
+              });
+
+            }
           }
         })
-
       }
     })
   },
@@ -127,7 +168,6 @@ Page({
             icon: 'success',
             duration: 2000
           });
-          //app.userInfo = null;
           // 注销以后，清空缓存
           wx.removeStorageSync("userInfo")
           // 页面跳转
@@ -146,9 +186,9 @@ Page({
   getMyVideoList: function (page) {
    
     var me = this;
-    var userInfo = app.getGlobalUserInfo();
+    var user = app.getGlobalUserInfo();
     var serverUrl = app.serverUrl;
-    var fileServerUrl = app.fileServerUrl + "/File/user/" + userInfo.id + "/videos/";
+    var fileServerUrl = app.fileServerUrl + "/File/user/" + user.id + "/videos/";
     
     // 查询视频信息
     wx.showLoading();
@@ -157,7 +197,7 @@ Page({
       url: serverUrl + '/video/showAll/?page=' + page + '&pageSize=9',
       method: "POST",
       data: {
-        userId: userInfo.id
+        userId: user.id
       },
       success: function (res) {
         wx.hideLoading();

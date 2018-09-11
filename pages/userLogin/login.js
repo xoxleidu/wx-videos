@@ -5,6 +5,15 @@ Page({
   },
 
   onLoad: function (params) {
+    var me = this;
+    var redirectUrl = params.redirectUrl;
+    if (redirectUrl != null && redirectUrl != undefined && redirectUrl != '') {
+      //正则表达式，@换成？ #换成=
+      redirectUrl = redirectUrl.replace(/@/g, "?");
+      redirectUrl = redirectUrl.replace(/#/g, "=");
+      console.info(redirectUrl);
+      me.redirectUrl = redirectUrl;
+    }
   },
 
   // 登录  
@@ -46,21 +55,19 @@ Page({
               icon: 'success',
               duration: 2000
             });
-            //app.userInfo = res.data.data;
             // fixme 修改原有的全局对象为本地缓存
             app.setGlobalUserInfo(res.data.data);
             // 页面跳转
-
-            // var redirectUrl = me.redirectUrl;
-            // if (redirectUrl != null && redirectUrl != undefined && redirectUrl != '') {
-            //   wx.redirectTo({
-            //     url: redirectUrl,
-            //   })
-            // } else {
-               wx.redirectTo({
-                 url: '../mine/mine',
-               })
-            // }
+            var redirectUrl = me.redirectUrl;
+            if (redirectUrl != null && redirectUrl != undefined && redirectUrl != '') {
+              wx.redirectTo({
+                url: redirectUrl,
+              })
+            } else {
+              wx.redirectTo({
+                url: '../mine/mine',
+              })
+            }
             
           } else if (res.data.status == 500) {
             // 失败弹出框

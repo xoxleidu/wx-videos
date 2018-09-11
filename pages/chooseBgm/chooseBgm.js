@@ -8,9 +8,7 @@ Page({
     },
 
     onLoad: function (params) {
-       
       var me = this;
-      console.log(params);
       me.setData({
         videoParams: params
       });
@@ -19,7 +17,7 @@ Page({
         title: '请等待...',
       });
       var serverUrl = app.serverUrl;
-      
+      var user = app.getGlobalUserInfo();
       //debugger;
       // 调用后端
       wx.request({
@@ -27,9 +25,10 @@ Page({
         method: "POST",
         header: {
           'content-type': 'application/json', // 默认值
+          'headerUserId': user.id,
+          'headerUserToken': user.userToken
         },
         success: function (res) {
-          console.log(res.data);
           wx.hideLoading();
           if (res.data.status == 200) {
             var bgmList = res.data.data;
@@ -71,11 +70,11 @@ Page({
       })
       var serverUrl = app.serverUrl;
       // fixme 修改原有的全局对象为本地缓存
-      var userInfo = app.getGlobalUserInfo();
+      var user = app.getGlobalUserInfo();
       wx.uploadFile({
         url: serverUrl + '/video/upload',
         formData: {
-          userId: userInfo.id,    // fixme 原来的 app.userInfo.id
+          userId: user.id,
           bgmId: bgmId,
           desc: desc,
           videoSeconds: duration,
@@ -86,8 +85,8 @@ Page({
         name: 'file',
         header: {
           'content-type': 'application/json', // 默认值
-          //'headerUserId': userInfo.id,
-          //'headerUserToken': userInfo.userToken
+          'headerUserId': user.id,
+          'headerUserToken': user.userToken
         },
         success: function (res) {
           var data = JSON.parse(res.data);
@@ -111,7 +110,7 @@ Page({
             // wx.uploadFile({
             //   url: serverUrl + '/video/uploadCover',
             //   formData: {
-            //     userId: app.userInfo.id,
+            //     userId: user.id,
             //     videoId: videoId
             //   },
             //   filePath: tmpCoverUrl,

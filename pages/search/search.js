@@ -45,7 +45,7 @@ Page({
   mySearchFunction: function (value) {
     // do your job here
     // 示例：跳转
-    wx.navigateTo({
+    wx.redirectTo({
       url: '../videoList/videoList?isSaveRecord=1&searchValue=' + value
     })
   },

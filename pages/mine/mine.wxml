@@ -40,10 +40,9 @@
 <view class="line"></view>
 
 <view class='container-video-list'>
-<view hidden='{{myWorkFalg}}'>
-    <block wx:for="{{myVideoList}}" >
-        <image src='{{fileServerUrl}}{{item.coverPath}}' class='videoImage' mode="aspectFill" bindtap='showVideo' data-arrindex='{{index}}'></image>
-    </block>
-</view>
-
+  <view hidden='{{myWorkFalg}}'>
+      <block wx:for="{{myVideoList}}" >
+          <image src='{{fileServerUrl}}{{item.coverPath}}' class='videoImage' mode="aspectFill" bindtap='showVideo' data-arrindex='{{index}}'></image>
+      </block>
+  </view>
 </view>

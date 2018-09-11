@@ -47,8 +47,8 @@ Page({
 
   getMyVideoList: function (isSaveRecord, page) {
     var me = this;
-    var userInfo = app.getGlobalUserInfo();
-    var fileServerUrl = app.fileServerUrl + "/File/user/" + userInfo.id + "/videos/";
+    var user = app.getGlobalUserInfo();
+    var fileServerUrl = app.fileServerUrl + "/File/user/" + user.id + "/videos/";
     // 查询视频信息
     wx.showLoading();
     // 调用后端
