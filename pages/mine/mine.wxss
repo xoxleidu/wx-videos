@@ -7,17 +7,17 @@ page {
     background-color: whitesmoke;
     display: flex;
     flex-direction: row;
-    height: 350rpx;
+    height: 380rpx;
 }
 .container-left{
     flex-direction: column;
-    width: 60%;
+    width: 55%;
     margin-left: 20rpx;
 }
 .container-right{
   position: relative;
     flex-direction: column;
-    width: 40%;
+    width: 43%;
     margin-right: 20rpx;
     text-align: right;
 }
@@ -29,27 +29,23 @@ page {
     background-color: rgb(238, 238, 238);
 }
 .container-xx {
-    display: flex;
-    flex-direction: row;
-    padding: 20rpx;
     background-color:whitesmoke;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
+    width: 99%;
+    padding-right: 10rpx;
 }
+
 .container-row label {
   width: 23%;
   text-align: center;
-}
-
-.info-items {
-    margin-left: 30px;
 }
 
 .face {
     width: 180rpx;
     height: 180rpx;
     border-radius: 50%;
-    margin-top: 50rpx;
+    margin-top: 80rpx;
 }
 
 .nickname {
@@ -67,19 +63,28 @@ page {
 
 .vlogout {
     text-align: right;
-    padding-top: 20rpx;
+    padding-top: 10rpx;
+    height: 80rpx;
 }
 .vprimary{
     text-align: right;
-    padding-top: 20rpx;
+    padding-top: 10rpx;
 }
 .logout {
     background-color:whitesmoke;
     color: rgb(180, 180, 180);
 }
-.primary{
+.upload{
     background-color: rgb(20, 167, 81);
     color: #fff;
+}
+.primary{
+    background-color: rgb(167, 20, 20);
+    color: #fff;
+}
+.noprimary{
+    background-color:#eee;
+    color: #555;
 }
 .floatright {
     float: right;
@@ -117,10 +122,9 @@ page {
 .container-video {
     display: flex;
     flex-direction: row;
-    margin-top: 20px;
     text-align: center;
-    border: solid 1px;
-    line-height: 30px;
+    line-height: 36px;
+    background-color: #eee;
 }
 
 .video-info {

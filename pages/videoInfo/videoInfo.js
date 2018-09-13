@@ -93,12 +93,20 @@ Page({
     })
   },
 
+  showIndex: function (e) {
+    wx.navigateTo({
+      url: '../index/index'
+    })
+  },
+
   showMine:function(e) {
     var me = this;
     var user = app.getGlobalUserInfo();
+    var videoInfo = me.data.videoInfo;
+    var realUrl = '../mine/mine@resultUserId#' + videoInfo.userId;
     if (user == null || user == "" || user == undefined) {
       wx.navigateTo({
-        url: '../userLogin/login'
+        url: '../userLogin/login?redirectUrl=' + realUrl
       })
     } else {
       wx.navigateTo({

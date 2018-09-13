@@ -3,103 +3,119 @@
 const app = getApp()
 Page({
   data: {
-    vid: 0,
-    pagey: '',
-    vsrc: [],
-    cover: "cover",
+    myVideoList: [],
+    myVideoPage: 1,
+    myVideoTotal: 1,
   },
   onLoad: function (){
+    this.getMyVideoList(1);    
+  },
+
+  getMyVideoList: function (page) {
     var me = this;
-    me.videoContext = wx.createVideoContext("myVideo", me);
-    //var user = app.getGlobalUserInfo();
     var serverUrl = app.serverUrl;
-    var page = 1;
+    var fileServerUrl = app.fileServerUrl + "/File/user/";
     // 查询视频信息
     wx.showLoading();
     // 调用后端
     wx.request({
-      url: serverUrl + '/video/showAll/?page=' + page,
+      url: serverUrl + '/video/showAll?page=' + page + '&pageSize=21',
       method: "POST",
       data: {},
       success: function (res) {
-        wx.hideLoading();
         console.info(res);
+        wx.hideLoading();
+        wx.hideNavigationBarLoading();
+        if (res.data.data.total === 0) {
+          wx.showToast({
+            title: '没有视频,请上传',
+            duration: 2000,
+            icon: "none"
+          })
+        }
+        if (page === 1) {
+          me.setData({
+            myVideoList: []
+          })
+        }
 
-        var vsrc = res.data.data.rows;
-        
-        var fileServerUrl = app.fileServerUrl + "/File/user/";
+        var myVideoList = res.data.data.rows;
+        var newVideoList = me.data.myVideoList;
+
         me.setData({
-          vsrc: vsrc,
+          myVideoPage: page,
+          myVideoList: newVideoList.concat(myVideoList),
+          myVideoTotal: res.data.data.total,
           fileServerUrl: fileServerUrl
         });
-
-
-
       }
     })
-    
   },
 
-  touchstart: function (res) {
-    this.setData({
-      pagey: res.changedTouches[0].pageY
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function () {
+    wx.showNavigationBarLoading();
+    this.getMyVideoList(1);
+  },
+
+  // 到底部后触发加载
+  onReachBottom: function () {
+    var myWorkFalg = this.data.myWorkFalg;
+    // var myLikesFalg = this.data.myLikesFalg;
+    // var myFollowFalg = this.data.myFollowFalg;
+
+    if (!myWorkFalg) {
+      var currentPage = this.data.myVideoPage;
+      var totalPage = this.data.myVideoTotal;
+      // 获取总页数进行判断，如果当前页数和总页数相等，则不分页
+      if (currentPage === totalPage) {
+        wx.showToast({
+          title: '已经没有视频啦...',
+          icon: "none"
+        });
+        return;
+      }
+      var page = currentPage + 1;
+      this.getMyVideoList(page);
+    }
+    // else if (!myLikesFalg) {
+    //   var currentPage = this.data.likeVideoPage;
+    //   var totalPage = this.data.myLikesTotal;
+    //   // 获取总页数进行判断，如果当前页数和总页数相等，则不分页
+    //   if (currentPage === totalPage) {
+    //     wx.showToast({
+    //       title: '已经没有视频啦...',
+    //       icon: "none"
+    //     });
+    //     return;
+    //   }
+    //   var page = currentPage + 1;
+    //   this.getMyLikesList(page);
+    // } else if (!myFollowFalg) {
+    //   var currentPage = this.data.followVideoPage;
+    //   var totalPage = this.data.followVideoTotal;
+    //   // 获取总页数进行判断，如果当前页数和总页数相等，则不分页
+    //   if (currentPage === totalPage) {
+    //     wx.showToast({
+    //       title: '已经没有视频啦...',
+    //       icon: "none"
+    //     });
+    //     return;
+    //   }
+    //   var page = currentPage + 1;
+    //   this.getMyFollowList(page);
+    // }
+  },
+
+  showVideo: function (e) {
+    var me = this;
+    var arrindex = e.target.dataset.arrindex;
+    var videoList = this.data.myVideoList;
+    var videoInfo = JSON.stringify(videoList[arrindex]);
+    wx.navigateTo({
+      url: '../videoInfo/videoInfo?videoInfo=' + videoInfo
     })
-  },
-  touchend: function (res) {
-    if (res.changedTouches[0].pageY - this.data.pagey > 50) {
-
-      var isZero = this.data.vid == 0
-      var id = this.data.vid == 0 ? 0 : this.data.vid - 1
-      if (isZero) {
-        wx.showToast({
-          title: '已是第一个！',
-        })
-      }
-      else {
-        this.setData({
-          vid: id
-        })
-        var that = this
-        setTimeout(function () { that.bindPlay() }, 500)
-      }
-    }
-    else if (this.data.pagey - res.changedTouches[0].pageY > 50) {
-      var islast = this.data.vid == this.data.vsrc.length - 1
-      var lid = this.data.vid == this.data.vsrc.length - 1 ? this.data.vsrc.length - 1 : this.data.vid + 1
-      if (islast) {
-        wx.showToast({
-          title: '已是最后一个！',
-        })
-      }
-      else {
-        this.setData({
-          vid: lid
-        })
-      }
-      var that = this
-      setTimeout(function () { that.bindPlay() }, 500)
-    }
-  },
-
-
-
-  
-
-  onShow: function () {
-    var me = this;
-    // me.videoCtx.play();
-    // me.setData({
-    //   container_play: "none",
-    //   container_pause: "block"
-    // })
-  },
-
-  onHide: function () {
-    var me = this;
-    // me.videoCtx.pause();
-    // me.setData({
-    //   container_play: "block",
-    //   container_pause: "none"
-    // })
-  },
+  }
 })
