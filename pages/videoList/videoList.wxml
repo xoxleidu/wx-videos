@@ -1,9 +1,5 @@
-
   <view class='container-video-list'>
-    <view hidden='{{myWorkFalg}}'>
         <block wx:for="{{myVideoList}}" >
-        <!-- <view style='width:400rpx;'>{{fileServerUrl}}{{item.coverPath}}</view> -->
-            <image src='{{fileServerUrl}}{{item.coverPath}}' class='videoImage' mode="aspectFill" bindtap='showVideo' data-arrindex='{{index}}'></image>
+            <image src='{{fileServerUrl}}{{item.userId}}/videos/{{item.coverPath}}' class='videoImage' mode="aspectFill" bindtap='showVideo' data-arrindex='{{index}}'></image>
         </block>
-    </view>
   </view>

@@ -45,16 +45,17 @@
 
               <cover-view class='video-desc'>
                 <cover-view>@{{publisher.nickname}}</cover-view>
-                <cover-view>videoDesc:{{videoInfo.videoDesc}}</cover-view>
+                <cover-view>{{videoInfo.videoDesc}}</cover-view>
               </cover-view>
 
               <cover-view class='bgm-style'>
                 <!-- 音乐BGM -->
                 <!-- <block wx.if="{{videoInfo.bgmName != null}}"> -->
-                  <cover-image class='size-me-bgm' src='../resource/images/music.png'></cover-image>
-                  <cover-view>《{{videoInfo.bgmName}}》</cover-view>
+                  <cover-view><cover-image class='size-me-bgm' src='../resource/images/music.png'></cover-image></cover-view>
+                  <cover-view>{{videoInfo.bgmName}}杜磊自创-卡路里我的天敌-clip</cover-view>
                 <!-- </block> -->
               </cover-view>
+
             </cover-view>
 
             <cover-view class='container-bottom'>
@@ -74,3 +75,16 @@
 
   </video>
 </view>
+<button tap="listenerButton">
+    <icon class="icon fa fa-external-link" bindtap="shareMe"></icon>分享
+</button>
+ 
+<!--默认action-sheet为隐藏，由button触发-->
+<action-sheet hidden="{{actionSheetHidden}}" bindchange="listenerActionSheet">
+   <action-sheet-item>
+         <button open-type="share">分享给好友</button>
+   </action-sheet-item>
+   <action-sheet-item>生成分享卡片</action-sheet-item>
+   <!--自动隐藏action-sheet-->
+   <action-sheet-cancel>取消</action-sheet-cancel>
+</action-sheet>

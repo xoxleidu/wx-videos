@@ -23,7 +23,6 @@ Page({
       method: "POST",
       data: {},
       success: function (res) {
-        console.info(res);
         wx.hideLoading();
         wx.hideNavigationBarLoading();
         if (res.data.data.total === 0) {

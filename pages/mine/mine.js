@@ -3,6 +3,7 @@ var videoUtils = require('../../utils/videoUtils.js')
 const app = getApp()
 
 Page({
+
   data: {
     faceUrl: "noneface.png",
     fileServerUrl: app.fileServerUrl + "/File/user/",

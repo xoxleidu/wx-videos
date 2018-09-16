@@ -7,6 +7,7 @@ Page({
    */
   data: {
     serverUrl: app.serverUrl,
+    fileServerUrl: app.fileServerUrl + "/File/user/",
 
     searchUserId:"",
     searchValue:"",
@@ -15,7 +16,6 @@ Page({
     myVideoPage: 1,
     myVideoTotal: 1,
 
-    myWorkFalg: false,
   },
 
   /**
@@ -47,8 +47,6 @@ Page({
 
   getMyVideoList: function (isSaveRecord, page) {
     var me = this;
-    var user = app.getGlobalUserInfo();
-    var fileServerUrl = app.fileServerUrl + "/File/user/" + user.id + "/videos/";
     // 查询视频信息
     wx.showLoading();
     // 调用后端
@@ -76,25 +74,20 @@ Page({
               url: '../search/search'
             })
           },2000);
-          
         }
         if (page === 1) {
           me.setData({
             myVideoList: []
           })
         }
-
         var myVideoList = res.data.data.rows;
-        wx.hideLoading();
-
         var newVideoList = me.data.myVideoList;
-
+        wx.hideLoading();
         me.setData({
           myVideoPage: page,
           myVideoList: newVideoList.concat(myVideoList),
           myVideoTotal: res.data.data.total,
-          serverUrl: app.serverUrl,
-          fileServerUrl: fileServerUrl
+          serverUrl: app.serverUrl
         });
       }
     })
@@ -112,22 +105,18 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-    var myWorkFalg = this.data.myWorkFalg;
-
-    if (!myWorkFalg) {
-      var currentPage = this.data.myVideoPage;
-      var totalPage = this.data.myVideoTotal;
-      // 获取总页数进行判断，如果当前页数和总页数相等，则不分页
-      if (currentPage === totalPage) {
-        wx.showToast({
-          title: '已经没有视频啦...',
-          icon: "none"
-        });
-        return;
-      }
-      var page = currentPage + 1;
-      this.getMyVideoList(0,page);
+    var currentPage = this.data.myVideoPage;
+    var totalPage = this.data.myVideoTotal;
+    // 获取总页数进行判断，如果当前页数和总页数相等，则不分页
+    if (currentPage === totalPage) {
+      wx.showToast({
+        title: '已经没有视频啦...',
+        icon: "none"
+      });
+      return;
     }
+    var page = currentPage + 1;
+    this.getMyVideoList(0,page);
   },
 
   /**

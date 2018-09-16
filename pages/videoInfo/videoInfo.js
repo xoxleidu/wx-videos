@@ -14,10 +14,17 @@ Page({
     faceUrl: "",
     publisher: {},
 
-    userLikeVideo: false
+    userLikeVideo: false,
+    actionSheetHidden: true,
+
   },
   onLoad: function (params){
-    console.info(params);
+
+    //开启分享回调
+    wx.showShareMenu({
+      withShareTicket: true
+    })
+
     var me = this;
     me.videoCtx = wx.createVideoContext("myVideo", me);
     // 获取上一个页面传入的参数
@@ -30,7 +37,6 @@ Page({
     if (width >= height) {
       cover = "";
     }
-
     me.setData({
       videoId: videoInfo.id,
       src: fileServerUrl + videoInfo.videoPath,
@@ -179,6 +185,64 @@ Page({
           })
         }
       })
+    }
+  },
+
+  //显示底部隐藏按钮-仿照wx.showActionSheet
+  shareMe: function () {
+    var me = this;
+    // wx.showActionSheet({
+    //   itemList: ['下载到本地', '举报用户', '分享到朋友圈', '分享到QQ空间', '分享到微博'],
+    //   success: function (res) {
+    //     console.info(res);
+    //   }
+    // })
+    me.setData({
+      actionSheetHidden: false,
+    })
+  },
+
+  //隐藏按钮监听
+  listenerButton: function () {
+    this.setData({
+      actionSheetHidden: !this.data.actionSheetHidden
+    });
+  },
+  listenerActionSheet: function () {
+    this.setData({
+      actionSheetHidden: !this.data.actionSheetHidden
+    })
+  },
+
+  //分享事件触发
+  onShareAppMessage: function (e) {
+    var me = this;
+    var user = app.getGlobalUserInfo();
+    return {
+      title: '微信短视频',
+      path: '/page/index/index',
+      //imageUrl: '../resource/images/bg.jpg',
+      success: function (res) {
+        console.log("分享成功" + res.shareTickets[0])
+        me.setData({
+          actionSheetHidden: true,
+        })
+        // console.log
+        wx.getShareInfo({
+          shareTicket: res.shareTickets[0],
+          success: function (res) { console.log("回调成功" + JSON.stringify(res)) },
+          fail: function (res) { console.log("回调失败" + res) },
+          complete: function (res) { console.log("回调完成" + res) }
+        })
+      },
+      fail: function (res) {
+        // 分享失败
+        console.log("分享失败" + res)
+        me.setData({
+          actionSheetHidden: true,
+        })
+      }
+      
     }
   }
 

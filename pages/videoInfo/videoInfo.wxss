@@ -28,20 +28,35 @@ page{
 }
 
 .container-me {
-    margin-top: 500rpx;
-    margin-left: 640rpx;
-    width: 80rpx;
+    margin-top: 380rpx;
+    margin-left: 624rpx;
+    width: 100rpx;
+}
+
+.face {
+    width: 100rpx;
+    height: 100rpx;
+    /* margin: 20rpx; */
+    border-radius: 50%;
+    margin-bottom: 60rpx;
+    margin-right: 50rpx;
+}
+
+.size-me {
+    width: 70rpx;
+    height: 70rpx;
+    margin: auto;
 }
 
 .container-words {
+    position: absolute;
+    bottom: 65rpx;
     display: flex;
-    /* flex-direction: column; */
-    margin-top: 100rpx;
-    margin-left: 50rpx;
-    width: 100%;
+    flex-direction: row;
+    margin: 50rpx;
+    width: 99%;
     color: white;
-    font-size: 14px;
-    justify-content: space-between;
+    font-size: 26rpx;
 }
 
 .inputText {
@@ -50,42 +65,42 @@ page{
 }
 
 .video-desc {
-    width: 200rpx;
-    height: 100rpx;
+    padding-top: 35rpx;
+    width: 60%;
     white-space: pre-wrap;
+}
+.video-desc cover-view {
+  width: 75%;
+  line-height: 42rpx;
 }
 .bgm-style {
-    /* display: flex;
-    flex-direction: row; */
-    width: 100rpx;
-    height: 100rpx;
-    padding-right: 50rpx;
+    width: 38%;
+    height: 120rpx;
+    padding-right: 80rpx;
     white-space: pre-wrap;
 }
+.bgm-style cover-view {
+    width: 100%;
+    line-height: 36rpx;
+    text-align: right;
+}
 .size-me-bgm {
-    width: 40rpx;
-    height: 40rpx;
+    display: inline;
+    float: right;
+    width: 80rpx;
+    height: 80rpx;
 }
 
 .container-bottom {
-    /* bottom: 10px;  */
+    position: absolute;
+    bottom: 0px; 
     display: flex;
-    margin-top: 10rpx;
-    padding-top: 0rpx;
-    padding-left: 50rpx;
-    padding-right: 50rpx;
-    padding-bottom: 50rpx;
-    /* margin-bottom: 10rpx; */
+    padding-top: 10rpx;
+    padding-bottom: 20rpx;
+    width: 100%;
     justify-content: space-between;
     /* position: fixed;  */
-    border-top-color: rgba(0, 0, 0, 0.150);
-    border-top-style: solid;
-    border-top-width: 1rpx;
-}
-
-.size-me {
-    width: 70rpx;
-    height: 70rpx;
+    background-color: #333;
 }
 
 .size-bottom {
@@ -97,7 +112,7 @@ page{
     height: 50rpx;
     background: none;
     
-    color: #000;
+    color: #fff;
     font-size: 24rpx;
 }
 
@@ -107,13 +122,6 @@ page{
     border: 0 solid #f00;
     border-radius: 100rpx;
     background-color: #f10b2e;
-}
-
-.face {
-    width: 75rpx;
-    height: 75rpx;
-    /* margin: 20rpx; */
-    border-radius: 50%;
 }
 
 .icoBtn {
