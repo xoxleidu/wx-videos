@@ -74,17 +74,21 @@
     
 
   </video>
+  
 </view>
+
+<!-- <view class='forFixBtnContact'></view> -->
 <button tap="listenerButton">
     <icon class="icon fa fa-external-link" bindtap="shareMe"></icon>分享
 </button>
  
 <!--默认action-sheet为隐藏，由button触发-->
 <action-sheet hidden="{{actionSheetHidden}}" bindchange="listenerActionSheet">
-   <action-sheet-item>
-         <button open-type="share">分享给好友</button>
+   <action-sheet-item class='shareBg'>
+         <action-sheet-item class='forFixBtnContact1'><button class='btnQuckpush' open-type='share' style='background: url("{{shareImgShare}}");'></button></action-sheet-item>
+         <action-sheet-item class='forFixBtnContact2'><button class='btnQuckpush' style='background: url("{{shareImgcode}}");'></button></action-sheet-item>
+         <action-sheet-item class='forFixBtnContact3'><button class='btnQuckpush' bindtap="downLoadVideo" style='background: url("{{shareImgdownload}}");'></button></action-sheet-item>
    </action-sheet-item>
-   <action-sheet-item>生成分享卡片</action-sheet-item>
    <!--自动隐藏action-sheet-->
-   <action-sheet-cancel>取消</action-sheet-cancel>
+   <action-sheet-cancel class="shareBgUn">取消</action-sheet-cancel>
 </action-sheet>

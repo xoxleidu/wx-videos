@@ -195,3 +195,62 @@ page{
     margin-left: 10px;
     font-size: 18px;
 }
+.btnQuckpush::after {
+
+  border: 0;
+
+}
+.btnQuckpush  {
+  /* background: url('http://114.116.24.17:8066/test.jpg');
+  background: url('../resource/images/shareup.png'); */
+  background-size:cover;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background-color: #5290e3;
+  width: 80px;
+  height: 80px; 
+  z-index: 2;
+}
+
+.forFixBtnContact1 {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  padding: 0;
+  box-sizing:border-box;
+  top: 20px;
+  left: 30px; 
+  
+}
+.forFixBtnContact2 {
+  position: absolute;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  padding: 0;
+  box-sizing:border-box;
+  top: 40rpx;
+  left: 310rpx; 
+  
+}
+.forFixBtnContact3 {
+  position: absolute;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  padding: 0;
+  box-sizing:border-box;
+  top: 40rpx;
+  left: 550rpx; 
+  
+}
+.shareBg {
+  background: #000;
+  height: 100px;
+  position: relative;
+}
+.shareBgUn {
+  background: #000;
+  color: #fff;
+}

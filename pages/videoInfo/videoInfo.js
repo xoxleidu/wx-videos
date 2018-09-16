@@ -4,7 +4,12 @@ var videoUtils = require('../../utils/videoUtils.js')
 const app = getApp()
 Page({
   data: {
+    shareImgShare: "../resource/images/shareup.png",
+    shareImgcode: "../resource/images/2code.png",
+    shareImgdownload: "../resource/images/download.png",
+
     faceUrl: "../resource/images/arrow.jpg",
+    fileServerUrl: app.fileServerUrl + "/File/user/",
     videoId: "",
     src: "",
     cover: "cover",
@@ -244,6 +249,29 @@ Page({
       }
       
     }
+  },
+
+  downLoadVideo: function() {
+    var me = this;
+    var videoInfo = me.data.videoInfo;
+    var fileServerUrl = me.data.fileServerUrl;
+    wx.showLoading({
+      title: '下载中...',
+    })
+    wx.downloadFile({
+      url: fileServerUrl + videoInfo.userId + "/videos/" + videoInfo.videoPath,
+      success:function(res) {
+        wx.saveVideoToPhotosAlbum({
+          filePath: res.tempFilePath,
+          success:function(res) {
+            me.setData({
+              actionSheetHidden: true,
+            })
+            wx.hideLoading();
+          }
+        })
+      }
+    })
   }
 
 
