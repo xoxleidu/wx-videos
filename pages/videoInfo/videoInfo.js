@@ -1,13 +1,10 @@
 //index.js
 var videoUtils = require('../../utils/videoUtils.js')
+var clipImgUtils = require('../../utils/clipImgUtils.js')
 //获取应用实例
 const app = getApp()
 Page({
   data: {
-    shareImgShare: "../resource/images/shareup.png",
-    shareImgcode: "../resource/images/2code.png",
-    shareImgdownload: "../resource/images/download.png",
-
     faceUrl: "../resource/images/arrow.jpg",
     fileServerUrl: app.fileServerUrl + "/File/user/",
     videoId: "",
@@ -20,8 +17,13 @@ Page({
     publisher: {},
 
     userLikeVideo: false,
-    actionSheetHidden: true,
+    actionSheetHidden: false,
+    actionComments: false,
+    placeholder: "说点什么...",
 
+    actionCodeImage: false,
+
+    commentsList: [],
   },
   onLoad: function (params){
 
@@ -77,6 +79,8 @@ Page({
         })
       }
     })
+
+    me.getCommentsList();
   },
 
   onShow: function () {
@@ -84,7 +88,9 @@ Page({
     me.videoCtx.play();
     me.setData({
       container_play: "none",
-      container_pause: "block"
+      container_pause: "block",
+      actionSheetHidden: false,
+      actionComments: false,
     })
   },
 
@@ -93,7 +99,9 @@ Page({
     me.videoCtx.pause();
     me.setData({
       container_play: "block",
-      container_pause: "none"
+      container_pause: "none",
+      actionSheetHidden: false,
+      actionComments: false,
     })
   },
 
@@ -193,26 +201,7 @@ Page({
     }
   },
 
-  //显示底部隐藏按钮-仿照wx.showActionSheet
-  shareMe: function () {
-    var me = this;
-    // wx.showActionSheet({
-    //   itemList: ['下载到本地', '举报用户', '分享到朋友圈', '分享到QQ空间', '分享到微博'],
-    //   success: function (res) {
-    //     console.info(res);
-    //   }
-    // })
-    me.setData({
-      actionSheetHidden: false,
-    })
-  },
-
   //隐藏按钮监听
-  listenerButton: function () {
-    this.setData({
-      actionSheetHidden: !this.data.actionSheetHidden
-    });
-  },
   listenerActionSheet: function () {
     this.setData({
       actionSheetHidden: !this.data.actionSheetHidden
@@ -222,15 +211,22 @@ Page({
   //分享事件触发
   onShareAppMessage: function (e) {
     var me = this;
-    var user = app.getGlobalUserInfo();
+    // var videoInfo = me.data.videoInfo;
+    var codeImagePath = e.target.dataset.codeimagenamemini;
+    var fileServerUrl = app.fileServerUrl;
+    // var user = app.getGlobalUserInfo();
+    if (codeImagePath != null && codeImagePath != "" && codeImagePath != undefined) {
+      var imageUrl = fileServerUrl + "/File/user/code/" + codeImagePath;
+    }
     return {
-      title: '微信短视频',
-      path: '/page/index/index',
-      //imageUrl: '../resource/images/bg.jpg',
+      //title: videoInfo.videoDesc,
+      //path: '/page/videoInfo/videoInfo?videoInfo=' + videoInfo,
+      imageUrl: imageUrl,
       success: function (res) {
         console.log("分享成功" + res.shareTickets[0])
         me.setData({
-          actionSheetHidden: true,
+          actionSheetHidden: false,
+          actionCodeImage: false,
         })
         // console.log
         wx.getShareInfo({
@@ -244,14 +240,100 @@ Page({
         // 分享失败
         console.log("分享失败" + res)
         me.setData({
-          actionSheetHidden: true,
+          actionSheetHidden: false,
+          actionCodeImage: false,
         })
       }
       
     }
   },
 
-  downLoadVideo: function() {
+  downLoadVideoAcode: function () {
+    var me = this;
+    var appId = app.appId;
+    var appSecret = app.appSecret;
+    var url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appId + "&secret=" + appSecret;
+    //根据appId和appSecret请求微信后台生成accessToken
+    wx.request({
+      url: url,
+      method: "GET",
+      success: function(res) {
+        var serverUrl = app.serverUrl;
+        var accessToken = res.data.access_token;
+        var user = app.getGlobalUserInfo();
+        //scene:最大32个可见字符，只支持数字，大小写英文以及部分特殊字符：!#$&'()*+,/:;=?@-._~，
+        var scene = "?code=1?userId=" + user.id;
+        var path = "pages/videoInfo/videoInfo";
+        var width = 300;
+        
+        var url = serverUrl
+          + "/video/getCodeImgPath?accessToken=" + accessToken
+          + "&scene=" + scene
+          + "&path=" + path
+          + "&width=" + width;
+
+        wx.request({
+          // 根据微信后台生成的accessToken 生成二维码保存到服务器，返回图片名
+          url: url,
+          method: "POST",
+          success: function(res) {
+            console.info(res);
+            me.setData({
+              actionCodeImage: true,
+              actionSheetHidden: false,
+              codeImageName: res.data.data
+            })
+            url = serverUrl
+              + "/video/getCodeImgPath?accessToken=" + accessToken
+              + "&scene=" + scene
+              + "&path=" + path
+              + "&width=180";
+            wx.request({
+              // 根据微信后台生成的accessToken 生成二维码保存到服务器，返回图片名
+              url: url,
+              method: "POST",
+              success: function (res) {
+                me.setData({
+                  codeImageNameMini: res.data.data
+                })
+              }
+            })
+
+          }
+        })
+      }
+    })
+  },
+
+  downLoadImage: function (e) {
+    var me = this;
+    var codeImagePath = e.currentTarget.dataset.codeimagepath;
+    wx.showLoading({
+      title: '下载中...',
+    })
+    wx.downloadFile({
+      url: codeImagePath,
+      success: function (res) {
+        wx.saveImageToPhotosAlbum({
+          filePath: res.tempFilePath,
+          success: function (res) {
+            
+            wx.showToast({
+              title: '保存成功...',
+            })
+          },
+          complete:function(res) {
+            me.setData({
+              actionCodeImage: false
+            })
+            wx.hideLoading();
+          }
+        })
+      }
+    })
+  },
+
+  downLoadVideo: function () {
     var me = this;
     var videoInfo = me.data.videoInfo;
     var fileServerUrl = me.data.fileServerUrl;
@@ -260,19 +342,147 @@ Page({
     })
     wx.downloadFile({
       url: fileServerUrl + videoInfo.userId + "/videos/" + videoInfo.videoPath,
-      success:function(res) {
+      success: function (res) {
         wx.saveVideoToPhotosAlbum({
           filePath: res.tempFilePath,
-          success:function(res) {
+          success: function (res) {
+            wx.showToast({
+              title: '保存成功...',
+            })
+          },
+          complete:function(res) {
             me.setData({
-              actionSheetHidden: true,
+              actionSheetHidden: false,
             })
             wx.hideLoading();
           }
         })
+      },
+      complete: function (res) {
+        me.setData({
+          actionSheetHidden: false,
+        })
+        wx.hideLoading();
       }
     })
-  }
+  },
+
+  //评论触发
+  leaveComment: function () {
+    this.setData({
+      commentFocus: true,
+      actionComments: true
+    });
+  },
+
+  replyFocus: function(e) {
+    var fatherCommentId = e.currentTarget.dataset.fathercommentid;
+    var toUserId = e.currentTarget.dataset.touserid;
+    var toNickname = e.currentTarget.dataset.tonickname;
+
+    this.setData({
+      placeholder: "回复  " + toNickname,
+      replyFatherCommentId: fatherCommentId,
+      replyToUserId: toUserId,
+      commentFocus: true
+    })
+  },
+
+  saveComment: function(e) {
+    var me = this;
+    var content = e.detail.value;
+    // 获取评论回复的fatherCommentId和toUserId
+    var fatherCommentId = e.currentTarget.dataset.replyfathercommentid;
+    var toUserId = e.currentTarget.dataset.replytouserid;
+
+    var serverUrl = app.serverUrl;
+    var user = app.getGlobalUserInfo();
+    var videoInfo = me.data.videoInfo;
+    var realUrl = '../videoinfo/videoinfo#videoInfo@' + videoInfo;
+    if (user == null || user == "" || user == undefined) {
+      wx.navigateTo({
+        url: '../userLogin/login?redirectUrl=' + realUrl
+      })
+    } else {
+      if (videoInfo.id == null || videoInfo.id == "" || videoInfo.id == undefined){
+        wx.showToast({
+          title: '您想评论谁啊',
+        })
+        return;
+      }
+      wx.showLoading({
+        title: '请稍后...',
+      })
+      if(fatherCommentId == null || 
+        fatherCommentId == "" || 
+        fatherCommentId == undefined || 
+        toUserId == null || 
+        toUserId == "" || 
+        toUserId == undefined) {
+          fatherCommentId = "";
+          toUserId = "";
+        }
+      //debugger;
+      wx.request({
+        url: serverUrl + '/video/saveComment?fatherCommentId=' + fatherCommentId + "&toUserId=" + toUserId,
+        method: "POST",
+        header: {
+          'content-type': 'application/json', // 默认值
+          'headerUserId': user.id,
+          'headerUserToken': user.userToken
+        },
+        data: {
+          fromUserId: user.id,
+          videoId: videoInfo.id,
+          comment: content
+        },
+        success: function(res) {
+          wx.hideLoading();
+          me.setData({
+            contentValue: "",
+            commentsList: [],
+            placeholder: "还想说点什么...",
+            replyFatherCommentId: "",
+            replyToUserId: ""
+          });
+          me.getCommentsList();
+        }
+      })
+    }
+  },
+
+  getCommentsList: function () {
+    var me = this;
+    var videoId = me.data.videoInfo.id;
+    wx.request({
+      url: app.serverUrl + '/video/getVideoComments?videoId=' + videoId,
+      method: "POST",
+      success: function (res) {
+        console.log(res.data);
+
+        var commentsList = res.data.data.rows;
+        var newCommentsList = me.data.commentsList;
+
+        me.setData({
+          commentsList: newCommentsList.concat(commentsList),
+        });
+      }
+    })
+  },
+
+
+  // onReachBottom: function () {
+  //   var me = this;
+  //   var currentPage = me.data.commentsPage;
+  //   var totalPage = me.data.commentsTotalPage;
+  //   if (currentPage === totalPage) {
+  //     return;
+  //   }
+  //   var page = currentPage + 1;
+  //   me.getCommentsList(page);
+  // },
+
+  
 
 
 

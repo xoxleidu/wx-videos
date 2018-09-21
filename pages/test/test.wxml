@@ -1,0 +1,4 @@
+<view>
+  <button bindtap='test' type='mini'>test</button>
+</view>
+<canvas canvas-id='CodeImageCanvas' style='width:200px;height:200px;background-color:#000'></canvas>

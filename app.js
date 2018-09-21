@@ -13,7 +13,7 @@ App({
 
   //华为云服务器
 
-  serverUrl: "http://114.116.27.14:8080/videos",
+  serverUrl: "http://114.116.27.14:8090/videos",
   fileServerUrl: "http://114.116.27.14:8066",
 
   user: null,
@@ -23,5 +23,8 @@ App({
   },
   getGlobalUserInfo: function () {
     return wx.getStorageSync("userInfo");
-  }
+  },
+
+  appId: "wxef279ea461a24e4d",
+  appSecret: "0089e53ff4127672e0825ef505e88ea7"
 })

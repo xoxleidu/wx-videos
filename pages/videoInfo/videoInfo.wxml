@@ -15,7 +15,12 @@
     </cover-view>
     <cover-view class='container-play' bindtap='onShow' style='display:{{container_play}}'>
     </cover-view>
-      
+
+<!-- <block wx:if="{{videoClip}}">
+<cover-view>
+  <canvas style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; background: #FFF" canvas-id="CodeImageCanvas"></canvas>
+</cover-view>
+</block> -->
 
             <cover-view class='container'>
                 <!-- 上传视频 -->
@@ -38,7 +43,7 @@
               <!-- 评论按钮 -->
               <cover-image class="size-me" src='../resource/images/comments.png' style='margin-top:30rpx;' bindtap='leaveComment'></cover-image>
               <!-- 分享按钮 -->
-              <cover-image class="size-me" src='../resource/images/share.png' style='margin-top:30rpx;' bindtap='shareMe'></cover-image>
+              <cover-image class="size-me" src='../resource/images/share.png' style='margin-top:30rpx;' bindtap='listenerActionSheet'></cover-image>
             </cover-view>
 
             <cover-view class='container-words'>
@@ -69,26 +74,72 @@
               <button bindtap="showFollow" class="size-bottom-bn">关注</button>
               <button bindtap="showMine" class="size-bottom-bn">我</button>
             </cover-view>
-      
-      
-    
 
+    <!-- 分享显示 -->
+    <block wx:if="{{actionSheetHidden}}">      
+      <cover-view class='shareView'>
+        <cover-view class='shareBg'>
+              <button open-type='share' class="btnQuckpush"><cover-image src='../resource/images/shareup.png'></cover-image></button>
+              <button bindtap='downLoadVideoAcode' class="btnQuckpush"><cover-image src='../resource/images/2code.png'></cover-image></button>
+              <button bindtap="downLoadVideo" class="btnQuckpush"><cover-image src='../resource/images/download.png'></cover-image></button>
+        </cover-view>
+        <cover-view class="shareBgUn"><button class="btnQuckpushUn" bindtap="listenerActionSheet">取消</button></cover-view>
+      </cover-view>
+    </block>
+
+    <!-- 二维码显示 -->
+    <block wx:if="{{actionCodeImage}}">
+    <cover-view class='code-view'>
+      <cover-image src='{{fileServerUrl}}code/{{codeImageName}}' class='code-image'></cover-image>
+      <cover-view class='code-view-button'>
+        <button open-type='share' type='primary' data-codeImageNameMini='{{codeImageNameMini}}'>分享</button>
+        <button bindtap='downLoadImage' type='primary' data-codeImagePath='{{fileServerUrl}}code/{{codeImageName}}'>保存</button>
+      </cover-view>
+    </cover-view>
+    </block>
+
+    <!-- 留言显示 -->
+    <block wx:if="{{actionComments}}">      
+      <cover-view class='commentsView'>
+        <block wx:for="{{commentsList}}">
+          <cover-view
+          class='comments-all'
+          bindtap='replyFocus'
+          data-fatherCommentId='{{item.id}}'  
+          data-toUserId='{{item.fromUserId}}' 
+          data-toNickname='{{item.nickname}}'
+          >
+            <cover-view class='container-comments'>
+              <cover-image class="face-comments" src='../resource/images/arrow.jpg'></cover-image>
+              <!-- <image class='face-comments' src='{{fileServerUrl}}/face/{{item.faceImage}}'></image> -->
+              <cover-view class='name-comments'>@{{item.nickname}}</cover-view>
+              <cover-view class='text-comments'>于{{item.timeAgoStr}}</cover-view>
+              <block wx:if="{{item.toNickname == null}}">
+                <cover-view class='text-comments'>留言</cover-view>
+              </block>
+              <block wx:else>
+                <cover-view class='text-comments'>回复</cover-view>
+                <cover-view class='toname-comments'>@{{item.toNickname}}</cover-view>
+              </block>
+            </cover-view>
+            <cover-view class='comments-content'>{{item.comment}}</cover-view>   
+          </cover-view>
+        </block>
+        <!-- <cover-view class="saySthView" bindtap='leaveComment'>
+          <input name="commentContent" class='saySth' placeholder='{{placeholder}}' confirm-type='send' bindconfirm='saveComment' focus='{{commentFocus}}' value='{{contentValue}}'>321</input>
+        </cover-view> -->
+      </cover-view>
+    </block>
+<!-- <view style='position: absolute;display:block;background-color: #888; height:200rpx;color:#fff;'>23213</view> -->
   </video>
-  
+
+</view>
+<view class="saySthView">
+<input name="commentContent" class="saySth" placeholder="{{placeholder}}" confirm-type="send" bindconfirm="saveComment" focus='{{commentFocus}}' value='{{contentValue}}'
+data-replyFatherCommentId='{{replyFatherCommentId}}'
+data-replyToUserId='{{replyToUserId}}'
+/>
 </view>
 
-<!-- <view class='forFixBtnContact'></view> -->
-<button tap="listenerButton">
-    <icon class="icon fa fa-external-link" bindtap="shareMe"></icon>分享
-</button>
- 
-<!--默认action-sheet为隐藏，由button触发-->
-<action-sheet hidden="{{actionSheetHidden}}" bindchange="listenerActionSheet">
-   <action-sheet-item class='shareBg'>
-         <action-sheet-item class='forFixBtnContact1'><button class='btnQuckpush' open-type='share' style='background: url("{{shareImgShare}}");'></button></action-sheet-item>
-         <action-sheet-item class='forFixBtnContact2'><button class='btnQuckpush' style='background: url("{{shareImgcode}}");'></button></action-sheet-item>
-         <action-sheet-item class='forFixBtnContact3'><button class='btnQuckpush' bindtap="downLoadVideo" style='background: url("{{shareImgdownload}}");'></button></action-sheet-item>
-   </action-sheet-item>
-   <!--自动隐藏action-sheet-->
-   <action-sheet-cancel class="shareBgUn">取消</action-sheet-cancel>
-</action-sheet>
+
+
