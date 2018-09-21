@@ -31,7 +31,7 @@
 
             <cover-view class='container-me'>
               <!-- 头像 -->
-              <cover-image class="face" src='{{faceUrl}}' bindtap='showPublisher'></cover-image>
+              <cover-image class="face" src='{{faceUrl}}' bindtap='showPublisher' data-userId='{{userId}}'></cover-image>
               <!-- <cover-image class="face" src='../resource/images/arrow.jpg' bindtap='showPublisher'></cover-image> -->
               <!-- 喜欢收藏按钮 -->
               <block wx:if="{{userLikeVideo}}">
@@ -110,16 +110,20 @@
           data-toNickname='{{item.nickname}}'
           >
             <cover-view class='container-comments'>
-              <cover-image class="face-comments" src='../resource/images/arrow.jpg'></cover-image>
-              <!-- <image class='face-comments' src='{{fileServerUrl}}/face/{{item.faceImage}}'></image> -->
-              <cover-view class='name-comments'>@{{item.nickname}}</cover-view>
+              <cover-view class='name-comments' bindtap='showPublisher' data-userId='{{item.fromUserId}}'>
+                <cover-image class='face-comments' src='{{fileServerUrl}}{{item.fromUserId}}/face/{{item.faceImage}}'></cover-image> {{item.nickname}}
+              </cover-view>
               <cover-view class='text-comments'>于{{item.timeAgoStr}}</cover-view>
               <block wx:if="{{item.toNickname == null}}">
                 <cover-view class='text-comments'>留言</cover-view>
               </block>
               <block wx:else>
                 <cover-view class='text-comments'>回复</cover-view>
-                <cover-view class='toname-comments'>@{{item.toNickname}}</cover-view>
+                
+                <cover-view class='toname-comments' bindtap='showPublisher' data-userId='{{item.toUserId}}'>
+                  <cover-image class='face-comments' src='{{fileServerUrl}}{{item.toUserId}}/face/{{item.tofaceImage}}'></cover-image>
+                  {{item.toNickname}}
+                </cover-view>
               </block>
             </cover-view>
             <cover-view class='comments-content'>{{item.comment}}</cover-view>   

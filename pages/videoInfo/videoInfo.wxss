@@ -143,7 +143,7 @@ page{
 }
 .comments-all {
     color: #e8e8e8;
-    border-bottom: solid 1px #222;
+    border-bottom: solid 1px #333;
 }
 .container-comments{
     display: flex;
@@ -155,28 +155,34 @@ page{
     
 }
 .text-comments {
-    color: #bbb;
+    color: #ccc;
 }
 .name-comments {
     color: #fff;
     font-size: 26rpx;
     font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    line-height: 50rpx;
 }
 .toname-comments {
-    color:aqua;
+    color:rgb(220, 255, 255);
     font-size: 26rpx;
     font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    line-height: 50rpx;
 }
 .face-comments {
     width: 50rpx;
     height: 50rpx;
     border-radius: 50%;
     vertical-align: middle;
-    margin-right: 20rpx;
+    margin:auto 10rpx;
 }
 .comments-content{
     border-top: solid 1px #212121;
-    padding:20rpx 30rpx;
+    padding:20rpx 0rpx 20rpx 50rpx;
     font-size: 28rpx;
 }
 .saySthView {

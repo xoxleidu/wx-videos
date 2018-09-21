@@ -6,6 +6,7 @@ const app = getApp()
 Page({
   data: {
     faceUrl: "../resource/images/arrow.jpg",
+    toFaceUrl: "../resource/images/arrow.jpg",
     fileServerUrl: app.fileServerUrl + "/File/user/",
     videoId: "",
     src: "",
@@ -13,16 +14,14 @@ Page({
     videoInfo: {},
     container_play: "none",
     container_pause: "block",
-    faceUrl: "",
+    //faceUrl: "",
     publisher: {},
-
     userLikeVideo: false,
+
+    placeholder: "说点什么...",
     actionSheetHidden: false,
     actionComments: false,
-    placeholder: "说点什么...",
-
     actionCodeImage: false,
-
     commentsList: [],
   },
   onLoad: function (params){
@@ -134,7 +133,7 @@ Page({
     }
   },
 
-  showPublisher: function(){
+  showPublisher: function(e){
     var me = this;
     var user = app.getGlobalUserInfo();
     var videoInfo = me.data.videoInfo;
@@ -144,8 +143,13 @@ Page({
         url: '../userLogin/login?redirectUrl=' + realUrl
       })
     } else {
+      var userId = e.currentTarget.dataset.userid;
+      console.info(userId);
+      if(userId == "" || userId == null || userId == undefined) {
+        userId = videoInfo.userId;
+      }
       wx.navigateTo({
-        url: '../mine/mine?resultUserId=' + videoInfo.userId
+        url: '../mine/mine?resultUserId=' + userId
       })
     }
   },
